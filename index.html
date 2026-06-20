@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Game Hub FIXED</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  direction:rtl;
+  background: linear-gradient(270deg,#ffeb3b,#2196f3,#ff9800);
+  background-size:400% 400%;
+  animation:bg 8s ease infinite;
+}
+
+@keyframes bg{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+
+.container{max-width:420px;margin:auto;padding:15px}
+
+.card{
+  background:rgba(255,255,255,0.92);
+  padding:15px;
+  border-radius:18px;
+  margin-top:15px;
+}
+
+input,button{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:12px;
+  border:1px solid #ccc;
+}
+
+button{
+  background:#222;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+}
+
+.user{
+  background:#f5f5f5;
+  padding:10px;
+  border-radius:12px;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- LOGIN -->
+  <div class="card" id="login">
+    <h3>تسجيل دخول 🎮</h3>
+    <input id="name" placeholder="الاسم">
+    <input id="pass" type="password" placeholder="الباسورد">
+    <button onclick="login()">دخول</button>
+  </div>
+
+  <!-- PANEL -->
+  <div class="card" id="panel" style="display:none">
+
+    <h3 id="welcome"></h3>
+
+    <button onclick="save()">💾 Save</button>
+
+    <div id="me"></div>
+
+    <div id="admin" style="display:none">
+      <h4>👑 Admin Panel</h4>
+      <div id="users"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+let users = {
+  "Aya": {pass:"6678",level:1},
+  "Habiba": {pass:"3342",level:1},
+  "Yassin": {pass:"2217",level:1},
+  "Marwan": {pass:"2234",level:1},
+  "admin": {pass:"admin",level:999}
+};
+
+let current=null;
+
+/* LOAD */
+function load(){
+  let d=localStorage.getItem("gameFix");
+  if(d) users=JSON.parse(d);
+}
+load();
+
+/* SAVE */
+function save(){
+  localStorage.setItem("gameFix",JSON.stringify(users));
+  alert("💾 تم الحفظ");
+}
+
+/* LOGIN */
+function login(){
+
+  let n=document.getElementById("name").value.trim();
+  let p=document.getElementById("pass").value;
+
+  let found=null;
+
+  for(let k in users){
+    if(k.toLowerCase()===n.toLowerCase()){
+      found=k;
+      break;
+    }
+  }
+
+  if(found && users[found].pass===p){
+
+    current=found;
+
+    document.getElementById("login").style.display="none";
+    document.getElementById("panel").style.display="block";
+
+    document.getElementById("welcome").innerText="أهلاً "+found;
+
+    if(found==="admin"){
+      document.getElementById("admin").style.display="block";
+      render();
+    }
+
+    show();
+
+  } else {
+    alert("❌ غلط في البيانات");
+  }
+}
+
+/* SHOW PLAYER */
+function show(){
+  let u=users[current];
+
+  document.getElementById("me").innerHTML=`
+    <div class="user">
+      ⭐ Level: 
+      <input value="${u.level}"
+      onchange="users[current].level=parseInt(this.value)">
+    </div>
+  `;
+}
+
+/* ADMIN EDIT */
+function render(){
+  let html="";
+  for(let k in users){
+    html+=`
+      <div class="user">
+        ${k}<br>
+        Level:
+        <input value="${users[k].level}"
+        onchange="users['${k}'].level=parseInt(this.value)">
+      </div>
+    `;
+  }
+  document.getElementById("users").innerHTML=html;
+}
+
+</script>
+
+</body>
+  </html>
